@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -8,6 +8,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@200;300;400;500;600;700&display=swap"
     rel="stylesheet">
+  <script src="https://checkout.bold.co/library/boldPaymentButton.js"></script>
   <style>
     @font-face {
       font-family: 'Galaksinos';
@@ -3090,23 +3091,23 @@
         </div>
         <!-- LOGIN -->
         <form class="auth-form active" id="login-form" onsubmit="handleLogin(event)">
-          <button type="button" class="auth-google-btn" onclick="loginWithGoogle()">
-            <svg width="18" height="18" viewBox="0 0 24 24">
-              <path
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                fill="#4285F4" />
-              <path
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                fill="#34A853" />
-              <path
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                fill="#FBBC05" />
-              <path
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                fill="#EA4335" />
-            </svg>
-            Continuar con Google
-          </button>
+          <!-- Google Identity Services Button -->
+          <div id="g_id_onload"
+               data-client_id="TU_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+               data-context="signin"
+               data-ux_mode="popup"
+               data-callback="handleGoogleResponse"
+               data-auto_prompt="false">
+          </div>
+          <div class="g_id_signin"
+               data-type="standard"
+               data-shape="rectangular"
+               data-theme="filled_black"
+               data-text="continue_with"
+               data-size="large"
+               data-logo_alignment="left"
+               data-width="100%">
+          </div>
           <div class="auth-or">O</div>
           <div class="form-group"><label class="form-label">Correo Electrónico</label><input class="form-input"
               type="email" placeholder="tu@correo.com" required></div>
@@ -3244,9 +3245,22 @@
             <div class="form-group"><label class="form-label">Nombre en tarjeta</label><input class="form-input"
                 type="text" placeholder="JUAN GARCIA"></div>
           </div>
-          <div style="display:flex;gap:12px;margin-top:4px;">
-            <button class="btn-outline" onclick="goToStep(1)" style="flex:1;justify-content:center;">← Volver</button>
-            <button class="form-submit" onclick="processPayment()" style="flex:2;margin-top:0;">Pagar Ahora →</button>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px;align-items:center;">
+            <div id="bold-button-container">
+              <!-- Botón de Bold con valores definidos -->
+              <script
+                data-bold-button
+                data-order-id="ORD-UNICO-1722528769"
+                data-currency="COP"
+                data-amount="30000"
+                data-api-key="1oYQxDSSySnjwiSnDE1c-x4P5iqVvZiyq04Tai3XMqI"
+                data-integrity-signature="184052a67540d0ec91a3a740803585baa61541ff38f26c04ce4b27ebbed7a77c"
+                data-redirection-url="https://micomercio.com/pagos/resultado"
+                data-description="Camiseta Rolling Stones XL"
+                data-tax="vat-19"
+              ></script>
+            </div>
+            <button class="btn-outline" onclick="goToStep(1)" style="width:100%;justify-content:center;">← Volver al resumen</button>
           </div>
         </div>
         <div class="checkout-step" id="checkout-step-3">
@@ -4201,10 +4215,13 @@
     /* ══ CART ══ */
     function addToCart(id, name, price, cat) {
       if (cart.some(c => c.id === id)) { showToast('Ya está en tu carrito'); return; }
-      if (!currentUser) { showToast('Inicia sesión para comprar'); setTimeout(() => openAuth(), 600); return; }
+      // Nota: Eliminamos la restricción de login aquí para que puedan agregar productos libremente
       cart.push({ id, name, price, cat });
       updateCartUI();
       showToast('Agregado al carrito', 'success');
+      
+      // Opcional: Abrir el carrito automáticamente al agregar
+      setTimeout(() => openCart(), 400);
     }
     function removeFromCart(id) {
       cart = cart.filter(c => c.id !== id);
@@ -4237,12 +4254,27 @@
       document.getElementById('login-form').classList.toggle('active', tab === 'login');
       document.getElementById('register-form').classList.toggle('active', tab === 'register');
     }
+    function handleGoogleResponse(response) {
+      // Este es el token que Google nos devuelve
+      const responsePayload = decodeJwtResponse(response.credential);
+      console.log("Google User:", responsePayload);
+      
+      loginUser(responsePayload.given_name || responsePayload.name, responsePayload.email);
+      showToast('Sesión iniciada con Google', 'success');
+    }
+
+    function decodeJwtResponse(token) {
+      let base64Url = token.split('.')[1];
+      let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    }
+
     function loginWithGoogle() {
-      const email = prompt('Ingresa tu correo de Google:');
-      if (!email) return;
-      if (!email.includes('@')) { showToast('Correo inválido'); return; }
-      loginUser(email.split('@')[0], email);
-      closeAuth();
+      // Esta función ahora es manejada por el botón oficial de Google
+      showToast('Usa el botón de Google arriba');
     }
     function handleLogin(e) {
       e.preventDefault();
@@ -4307,11 +4339,70 @@
       document.getElementById('card-fields').style.display = method === 'card' ? 'flex' : 'none';
     }
     function formatCard(input) { let v = input.value.replace(/\D/g, '').substring(0, 16); input.value = v.replace(/(.{4})/g, '$1 ').trim(); }
+    /* ══ BOLD.CO INTEGRATION ══ */
+    // NOTA: Reemplaza con tu llave pública de Bold.co (la encuentras en tu panel de Bold)
+    const BOLD_PUBLIC_KEY = '1oYQxDSSySnjwiSnDE1c-x4P5iqVvZiyq04Tai3XMqI';
+    const BOLD_INTEGRITY_KEY = 'CGf53O_MrYD39bHtkyTFgQ';
+
     function processPayment() {
-      showToast('Procesando pago...');
-      setTimeout(() => { goToStep(3); cart = []; updateCartUI(); showToast('¡Pago exitoso! Revisa tu correo', 'success'); }, 2000);
+      if (cart.length === 0) return;
+
+      const totalUSD = cart.reduce((s, i) => s + i.price, 0);
+      const TRM = 4000; // Tasa de cambio aproximada USD -> COP
+      const totalCOP = totalUSD * TRM;
+
+      if (BOLD_PUBLIC_KEY === 'TU_LLAVE_PUBLICA_AQUI') {
+        showToast('Configura tu BOLD_PUBLIC_KEY en el código', 'info');
+        // Simulación para propósitos de prueba si no hay llave
+        setTimeout(() => {
+          goToStep(3);
+          cart = [];
+          updateCartUI();
+          showToast('Simulación: Pago exitoso', 'success');
+        }, 2000);
+        return;
+      }
+
+      showToast('Abriendo pasarela de pago...', 'info');
+
+      const productIds = cart.map(i => i.id).join('-');
+      const orderId = `JEAN-${productIds}-${Date.now()}`;
+
+      // Inicializar el Checkout de Bold
+      try {
+        const boldCheckout = new Bold.Checkout({
+          apiKey: BOLD_PUBLIC_KEY,
+          amount: totalCOP.toString(),
+          currency: 'COP',
+          orderId: orderId,
+          customerEmail: currentUser.email, // Necesario para enviar el producto por correo
+          description: 'Compra de Animaciones - Jean Design',
+          onTransactionFinished: (transaction) => {
+            console.log('Resultado Bold:', transaction);
+            if (transaction.status === 'APPROVED') {
+              goToStep(3);
+              cart = [];
+              updateCartUI();
+              showToast('¡Pago exitoso! Los archivos se enviarán a tu correo.', 'success');
+            } else if (transaction.status === 'REJECTED') {
+              showToast('El pago fue rechazado. Intenta con otro medio.', 'error');
+            } else {
+              showToast('Transacción pendiente o cancelada.', 'info');
+            }
+          }
+        });
+
+        boldCheckout.open();
+      } catch (err) {
+        console.error('Error al abrir Bold:', err);
+        showToast('Error al conectar con la pasarela de pago.', 'error');
+      }
     }
-    function finishCheckout() { closeCheckout(); showToast('Archivos enviados a tu correo', 'success'); }
+
+    function finishCheckout() {
+      closeCheckout();
+      showToast('Tus productos están siendo procesados ✓', 'success');
+    }
 
     /* ══ TOAST ══ */
     function showToast(msg, type = 'info') {
@@ -4323,6 +4414,8 @@
       setTimeout(() => t.remove(), 2700);
     }
   </script>
+  <script src="https://checkout.bold.co/library/boldPaymentButton.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </body>
 
 </html>
