@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -3092,21 +3092,11 @@
         <!-- LOGIN -->
         <form class="auth-form active" id="login-form" onsubmit="handleLogin(event)">
           <!-- Google Identity Services Button -->
-          <div id="g_id_onload"
-               data-client_id="TU_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
-               data-context="signin"
-               data-ux_mode="popup"
-               data-callback="handleGoogleResponse"
-               data-auto_prompt="false">
+          <div id="g_id_onload" data-client_id="TU_GOOGLE_CLIENT_ID.apps.googleusercontent.com" data-context="signin"
+            data-ux_mode="popup" data-callback="handleGoogleResponse" data-auto_prompt="false">
           </div>
-          <div class="g_id_signin"
-               data-type="standard"
-               data-shape="rectangular"
-               data-theme="filled_black"
-               data-text="continue_with"
-               data-size="large"
-               data-logo_alignment="left"
-               data-width="100%">
+          <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_black"
+            data-text="continue_with" data-size="large" data-logo_alignment="left" data-width="100%">
           </div>
           <div class="auth-or">O</div>
           <div class="form-group"><label class="form-label">Correo Electrónico</label><input class="form-input"
@@ -3248,19 +3238,14 @@
           <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px;align-items:center;">
             <div id="bold-button-container">
               <!-- Botón de Bold con valores definidos -->
-              <script
-                data-bold-button
-                data-order-id="ORD-UNICO-1722528769"
-                data-currency="COP"
-                data-amount="30000"
+              <script data-bold-button data-order-id="ORD-UNICO-1722528769" data-currency="COP" data-amount="30000"
                 data-api-key="1oYQxDSSySnjwiSnDE1c-x4P5iqVvZiyq04Tai3XMqI"
                 data-integrity-signature="184052a67540d0ec91a3a740803585baa61541ff38f26c04ce4b27ebbed7a77c"
                 data-redirection-url="https://micomercio.com/pagos/resultado"
-                data-description="Camiseta Rolling Stones XL"
-                data-tax="vat-19"
-              ></script>
+                data-description="Camiseta Rolling Stones XL" data-tax="vat-19"></script>
             </div>
-            <button class="btn-outline" onclick="goToStep(1)" style="width:100%;justify-content:center;">← Volver al resumen</button>
+            <button class="btn-outline" onclick="goToStep(1)" style="width:100%;justify-content:center;">← Volver al
+              resumen</button>
           </div>
         </div>
         <div class="checkout-step" id="checkout-step-3">
@@ -3792,7 +3777,7 @@
               <div class="cat-section-title">Contenido <em>Quiereme</em></div>
               <div class="cat-section-desc">Packs exclusivos de animaciones verticales 9:16. Diseñados para máxima
                 retención en dispositivos móviles.</div>
-              <div class="cat-section-count">1 producto · $50 USD</div>
+              <div class="cat-section-count">1 producto · $15 USD</div>
             </div>
           </div>
           <div class="mvp-grid" id="quiereme-grid">
@@ -3923,7 +3908,7 @@
       { id: 110, name: 'Déjà Vu', src: 'Dejavu.webm', price: 50, desc: 'Animación con efecto de loop visual. Una entrada que genera sensación de familiaridad y reconocimiento inmediato.' },
       { id: 111, name: 'Destructor', src: 'Destructor.webm', price: 50, desc: 'Para los streamers que dominan el campo. Efectos de destrucción y energía brutal que definen tu presencia.' },
       { id: 112, name: 'Oski', src: 'Oski.webm', price: 50, desc: 'Estilo único y personalizado. Una animación que refleja tu esencia como creador de contenido.' },
-      { id: 113, name: 'Quiereme FC Barcelona', src: 'QUIEREME FC BARCELONA.webm', poster: 'Quiereme.png', price: 50, desc: 'Animación vertical 9:16 inspirada en el FC Barcelona. Perfecta para TikTok, Reels y Shorts con efectos dinámicos y rítmicos.', cat: 'quiereme' },
+      { id: 113, name: 'Quiereme FC Barcelona', src: 'QUIEREME FC BARCELONA.webm', poster: 'Quiereme.png', price: 15, desc: 'Animación vertical 9:16 inspirada en el FC Barcelona. Perfecta para TikTok, Reels y Shorts con efectos dinámicos y rítmicos.', cat: 'quiereme' },
     ];
 
     /* ══ STATE ══ */
@@ -4219,7 +4204,7 @@
       cart.push({ id, name, price, cat });
       updateCartUI();
       showToast('Agregado al carrito', 'success');
-      
+
       // Opcional: Abrir el carrito automáticamente al agregar
       setTimeout(() => openCart(), 400);
     }
@@ -4258,7 +4243,7 @@
       // Este es el token que Google nos devuelve
       const responsePayload = decodeJwtResponse(response.credential);
       console.log("Google User:", responsePayload);
-      
+
       loginUser(responsePayload.given_name || responsePayload.name, responsePayload.email);
       showToast('Sesión iniciada con Google', 'success');
     }
@@ -4266,7 +4251,7 @@
     function decodeJwtResponse(token) {
       let base64Url = token.split('.')[1];
       let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      let jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
       }).join(''));
       return JSON.parse(jsonPayload);
